@@ -1,0 +1,1 @@
+select count(*) as total_rows from tasks where user_id = ?;

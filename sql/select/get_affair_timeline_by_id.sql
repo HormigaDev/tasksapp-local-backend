@@ -1,0 +1,1 @@
+select id from timelines where id = ? and affair_id = ?;

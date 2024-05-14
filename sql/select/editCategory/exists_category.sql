@@ -1,0 +1,1 @@
+select id from categories where id = ? and user_id = ?;

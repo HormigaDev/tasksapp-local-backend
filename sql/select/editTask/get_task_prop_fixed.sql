@@ -1,0 +1,1 @@
+select fixed from tasks where id = ? and fixed = ?;

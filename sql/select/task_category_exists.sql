@@ -1,1 +1,1 @@
-select id from categories where id = ?;
+select id from categories where user_id = ? and id = ?;

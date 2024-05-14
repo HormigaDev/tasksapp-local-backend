@@ -1,0 +1,1 @@
+update users set last_update = ? where id = ?;

@@ -1,32 +1,28 @@
-class ValidationError extends Error {
-  constructor(message){
-    super(message);
-    this.name = 'ValidationError';
-  }
-}
+const ValidationError = require('../classes/ValidationError');
 
 /**
  * 
  * @param {object} model El modelo a validar
  * @param {object} schema El esquema a seguir
  * @returns {boolean} true si el modelo es válido, false si no
+ * @throws {ValidationError} El error de validación
  */
 function validateModel(model, schema){
   if(!model || !schema) throw new ValidationError('El modelo y el esquema son requeridos');
   if(typeof model !== 'object' || Array.isArray(model)) throw new ValidationError('El modelo debe ser un objeto');
   if(typeof schema !== 'object' || Array.isArray(schema)) throw new ValidationError('El esquema debe ser un objeto');
   for(const key in schema){
-    if(!model[key]) throw new ValidationError(`La propiedad "${key}" no existe en el objeto informado.`)
+    if(model[key] === undefined) throw new ValidationError(`La propiedad "${key}" no existe en el objeto informado.`)
     const obj = schema[key];
     if(obj.type){
       if(Array.isArray(obj.type)){
         const type = obj.type[0];
-        if(!Array.isArray(model[key])) throw new ValidationError(`La propiedad "${key}" debe ser un array de tipo ${type.name}`)
+        if(!Array.isArray(model[key])) throw new ValidationError(`La propiedad "${key}" debe ser un array de tipo ${type}`)
         for(const item of model[key]){
-          if(!(item instanceof type)) throw new ValidationError(`Se encontró un elemento en "${key}" que no es de tipo ${type.name}. Tipo: ${typeof item} Valor: ${item}`)
+          if(typeof item !== type) throw new ValidationError(`Se encontró un elemento en "${key}" que no es de tipo ${type}. Tipo: ${typeof item} Valor: ${item}`)
         }
       } else {
-        if(!(model[key] instanceof obj.type)) throw new ValidationError(`La propiedad "${key}" debe ser de tipo ${obj.type.name}. Tipo informado: ${typeof model[key]} Valor: ${model[key]}`)
+        if(typeof model[key] !== obj.type) throw new ValidationError(`La propiedad "${key}" debe ser de tipo ${obj.type}. Tipo informado: ${typeof model[key]} Valor: ${model[key]}`)
       }
     }
     if(obj.limit){
@@ -38,12 +34,12 @@ function validateModel(model, schema){
         if(model[key].length > obj.limit) throw new ValidationError(`El máximo de caracteres para la propiedad "${key}" es ${obj.limit}.`);
       }
     }
-    if(obj.rules){
-      for(const rule of obj.rules){
-        if(rule?.name && rule?.rule){
-          if(!rule.rule(model[key])) throw new ValidationError(`La propiedad "${key}" falló en la regla "${rule.name}"`);
+    if(obj.rules !== undefined && Array.isArray(obj.rules)){
+      for(let rl of obj.rules){
+        if(rl.name && rl.rule){
+          if(rl.rule(model[key]) === false) throw new ValidationError(`La propiedad "${key}" falló en la regla "${rl.name}"`);
         } else {
-          if(!rule(model[key])) throw new ValidationError(`La propiedad "${key}" falló en una o más reglas.`);
+          if(rl(model[key]) === false) throw new ValidationError(`La propiedad "${key}" falló en una o más reglas.`);
         }
       }
     }
@@ -51,4 +47,4 @@ function validateModel(model, schema){
   return true;
 }
 
-module.exports = {validateModel, ValidationError};
+module.exports = validateModel;

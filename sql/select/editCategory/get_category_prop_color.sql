@@ -1,0 +1,1 @@
+select id from categories where color = ? and id = ?;

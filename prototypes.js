@@ -16,8 +16,21 @@ Date.prototype.toFormat = function(format='YYYY-MM-DD HH:mm:ss'){
 
 Object.prototype.toArray = function(){
   let array = [];
-  for(const key in this){
-    array.push(this[key]);
+  const obj = this;
+  for(const key of Object.keys(obj)){
+    array.push(obj[key]);
   }
   return array;
+}
+
+/**
+ * 
+ * @param {number} number - Número de niveles a subir
+ */
+String.prototype.ul = function(number){
+  let ul = this;
+  for(let i = 0; i < number; i++){
+    ul = '../' + ul;
+  }
+  return ul;
 }
