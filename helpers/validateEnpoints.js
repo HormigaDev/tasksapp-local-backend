@@ -14,5 +14,7 @@ module.exports = {
     'edit-affair',
     'edit-affair-timeline'
   ],
-  delete: []
+  delete: [
+    'delete-user',
+  ]
 }

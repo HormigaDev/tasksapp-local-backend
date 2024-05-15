@@ -45,7 +45,7 @@ db.last_rowid = () => {
   return new Promise((resolve) => {
     db.get('select last_insert_rowid() as id', (err, row) => {
       if(err){
-        // console.log(err);
+        console.log(err);
         resolve(false);
       }
       resolve(row.id);

@@ -1,0 +1,1 @@
+select id from phones where ddd = ? and ph_number = ? and type = ?;

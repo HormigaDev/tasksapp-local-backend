@@ -23,14 +23,11 @@ Object.prototype.toArray = function(){
   return array;
 }
 
-/**
- * 
- * @param {number} number - Número de niveles a subir
- */
-String.prototype.ul = function(number){
-  let ul = this;
-  for(let i = 0; i < number; i++){
-    ul = '../' + ul;
+Number.prototype.repeat = function(quantity=2){
+  if(typeof quantity !== 'number') throw new Error('La cantidad informada debe ser un número');
+  let array = [];
+  for(let i = 0; i < quantity; i++){
+    array.push(this);
   }
-  return ul;
+  return array;
 }
