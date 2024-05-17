@@ -3,7 +3,29 @@ module.exports = {
     type: 'string',
     limit: [4, 50],
     rules: [
-      value => /^[a-zA-Z0-9]{4,}$/.test(value)
+      value => /^[a-zA-Z0-9_-]{4,}$/.test(value)
+    ]
+  },
+  password: {
+    type: 'string',
+    limit: [8, 20],
+    rules: [
+      {
+        name: 'Tiene mayúsculas',
+        rule: value => /[A-Z]/.test(value)
+      },
+      {
+        name: 'Tiene minúsculas',
+        rule: value => /[a-z]/.test(value)
+      },
+      {
+        name: 'Tiene números',
+        rule: value => /[0-9]/.test(value)
+      },
+      {
+        name: 'Tiene caracteres especiales',
+        rule: value => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)
+      }
     ]
   },
   email: {

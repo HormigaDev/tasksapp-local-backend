@@ -1,5 +1,6 @@
 insert into users(
   username,
+  password,
   email,
   type,
   status,
@@ -8,4 +9,4 @@ insert into users(
   last_session,
   avatar_url
 )
-values (?, ?, ?, ?, ?, ?, ?, ?);
+values (?, ?, ?, ?, ?, ?, ?, ?, ?);

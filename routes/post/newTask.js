@@ -23,6 +23,7 @@ const route = new Route('/new-task', async (req, res) => {
       run_date: r.run_date,
       priority_id: Number(r.priority_id)
     }; // Objeto que contiene los datos de la tarea
+    nt.userid = user_id;
     nt.user_id = user_id;
     nt.status = 'created';
     nt.fixed = 0;

@@ -7,8 +7,8 @@ Date.prototype.toFormat = function(format='YYYY-MM-DD HH:mm:ss'){
   const second = this.getSeconds();
   return format
     .replace('YYYY', year)
-    .replace('MM', month)
-    .replace('DD', day)
+    .replace('MM', ('0'+month).slice(-2))
+    .replace('DD', ('0'+day).slice(-2))
     .replace('HH', hour)
     .replace('mm', minute)
     .replace('ss', second);

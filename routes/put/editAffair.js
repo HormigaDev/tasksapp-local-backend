@@ -19,7 +19,7 @@ const route = new Route('/edit-affair', async (req, res) => {
         title: r.title,
         person_name: r.person_name,
       };
-      if(!await existsAffair(affairId)) throw new ValidationError(`El asunto con id '${affairId}' no existe.`);
+      if(!await existsAffair(affairId, req.user_id)) throw new ValidationError(`El asunto con id '${affairId}' no existe.`);
       await db.commit();
       db.serialize(async () => {
         try {

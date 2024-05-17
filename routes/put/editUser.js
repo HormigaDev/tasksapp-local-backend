@@ -39,7 +39,8 @@ const route = new Route('/edit-user', async (req, res) => {
         await db.rollback();
         console.log(err);
         if(err instanceof SQLError) return res.status(500).json({ error: err.message });
-        if(err instanceof ValidationError) return res.status(400).json({ error: err.message }); 
+        if(err instanceof ValidationError) return res.status(400).json({ error: err.message });
+        return res.status(500).json({ error: '¡Ha ocurrido un error al intentar actualizar el usuario!' }); 
       }
     });
     

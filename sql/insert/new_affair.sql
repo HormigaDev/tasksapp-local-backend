@@ -3,5 +3,6 @@ insert into affairs (
   person_name,
   user_id,
   created_at,
-  last_update
-) values (?, ?, ?, ?, ?);
+  last_update,
+  status
+) values (?, ?, ?, ?, ?, ?);

@@ -18,7 +18,8 @@ const route = new Route('/new-affair', async (req, res) => {
     const newAffair = {
       title: r.title,
       person_name: r.person_name,
-      user_id: req.user_id
+      user_id: req.user_id,
+      status: 'created'
     }
   
     newAffair.created_at = new Date().toFormat();

@@ -15,12 +15,14 @@ const savePhone = require('./functions/newUser/savePhone');
 const relationUserPhone = require('./functions/newUser/relationUserPhone');
 const createPriorities = require('./functions/newUser/createPriorities');
 const validateModel  = require('../../helpers/validateModel');
+const { hash } = require('../../helpers/ciphers');
 
 const route = new Route('/new-user', async (req, res) => {
   try {
     const r = req.body;
     const nu = {
       username: r.username,
+      password: r.password,
       email: r.email,
       user_type: r.user_type,
       status: r.status,
@@ -38,7 +40,7 @@ const route = new Route('/new-user', async (req, res) => {
   
     if(validateModel(nu, userSchema) && validateModel(np, phoneSchema)){
       db.serialize(async () => {
-        if(await existsUser(nu.email)){
+        if(await existsUser(nu.email, nu.username)){
           return res.status(409).json({ message: '¡El usuario ya existe!' });
         }
         await db.commit();
@@ -46,6 +48,7 @@ const route = new Route('/new-user', async (req, res) => {
           try {
             await db.begin();
             let phoneId = await existsPhone(np.ddd, np.ph_number, np.ph_type);
+            nu.password = await hash(nu.password);
             const userId = await saveUser(nu);
             if(userId){
               if(!phoneId){
@@ -55,7 +58,7 @@ const route = new Route('/new-user', async (req, res) => {
                 if(await relationUserPhone(userId, phoneId)){
                   if(await createPriorities(userId)){
                     await db.commit();
-                    res.status(201).json({ message: '¡Usuario creado con éxito!' });
+                    res.status(201).json({ message: '¡Usuario creado con éxito!', userId });
                   }
                 }
               }

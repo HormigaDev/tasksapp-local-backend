@@ -1,0 +1,1 @@
+select id from affairs where id = ? and user_id = ?;

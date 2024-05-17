@@ -21,20 +21,21 @@ function existsUser(userId){
 async function detectUserId(req, res, next){
   const method = req.method.toLowerCase();
   const url = req.url;
-  const route = url.split('/')[1];
+  const route = url.split('/')[1].split('?')[0];
   const userId = Number(req.headers['user-id']);
   if(validateEndpoints[method].includes(route)){
-    if(userId){
+    if(isNaN(userId)){
+      res.status(400).json({ message: '¡El encabezado User-Id no es un número!'});
+      return;
+    }
+    if(userId !== undefined){
       try {
-        if(isNaN(userId)){
-          res.status(400).json({ message: '¡El encabezado User-Id no es un número!'});
-          return;
-        }
         const userExists = await existsUser(userId);
         if(!userExists){
           res.status(404).json({ message: '¡El usuario no existe!'});
           return;
         }
+        req.user_id = userId;
       } catch(err){
         if(err instanceof SQLError){
           res.status(500).json({ message: err.message });
@@ -43,11 +44,10 @@ async function detectUserId(req, res, next){
           res.status(500).json({ message: '¡Error al identificar el usuario! Error interno.'});
         }
       }
-      req.user_id = userId;
       next();
       return;
     } else {
-      res.status(400).json({ message: '¡No se ha proporcionado el encabezado User-Id!'});
+      res.status(401).json({ message: '¡No se ha proporcionado el encabezado User-Id!'});
     }
   } else {
     next();

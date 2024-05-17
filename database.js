@@ -4,9 +4,15 @@ const db = new sqlite3.Database(path.join(process.env.ROOT, 'BbelStudio/Apps/Tas
 const fs = require('fs');
 const configurations = require('./configs.js');
 
-db.read = (type, name) => {
+db.read = (type, name, vars) => {
   const dir = path.resolve(__dirname, 'sql', type, `${name}.sql`);
-  return fs.readFileSync(dir, { encoding: 'utf-8'});
+  let file = fs.readFileSync(dir, { encoding: 'utf-8'});
+  if(vars){
+    for(const key in vars){
+      file = file.replace(new RegExp(`{{${key}}}`, 'g'), vars[key]);
+    }
+  }
+  return file;
 }
 db.begin = () => {
   return new Promise((resolve) => {
@@ -50,6 +56,23 @@ db.last_rowid = () => {
       }
       resolve(row.id);
     });
+  })
+}
+/**
+ * 
+ * @param {string} table - El nombre de la tabla 
+ * @returns {Promise<number>}
+ */
+db.total = (table, condition='') => {
+  return new Promise((resolve, reject) => {
+    db.get(`select count(*) as total from ${table} ${condition??''}`, (err, row) => {
+      if(err){
+        console.log(err);
+        return undefined;
+      } else {
+        resolve(row.total);
+      }
+    })
   })
 }
 

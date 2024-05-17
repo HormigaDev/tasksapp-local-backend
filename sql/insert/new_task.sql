@@ -9,4 +9,8 @@ insert into tasks (
   created_at,
   last_update
 )
-values (?, ?, ?, ?, ?, ?, ?, ?, ?);
+values (?, ?, ?, (
+  select id
+  from priorities
+  where weight = ? and user_id = ?
+), ?, ?, ?, ?, ?);

@@ -18,6 +18,7 @@ function validateModel(model, schema){
       if(Array.isArray(obj.type)){
         const type = obj.type[0];
         if(!Array.isArray(model[key])) throw new ValidationError(`La propiedad "${key}" debe ser un array de tipo ${type}`)
+        if(!obj.acceptNull && model[key].length === 0) throw new ValidationError(`La propiedad '${key}' no puede ser una lista vacía.`);
         for(const item of model[key]){
           if(typeof item !== type) throw new ValidationError(`Se encontró un elemento en "${key}" que no es de tipo ${type}. Tipo: ${typeof item} Valor: ${item}`)
         }
@@ -27,8 +28,8 @@ function validateModel(model, schema){
     }
     if(obj.limit){
       if(Array.isArray(obj.limit)){
-        if(model[key].length < obj.limit[0]) throw new ValidationError(`El mínimo de caracteres para la propiedad "${key}" es ${obj.limit[0]}.`);
-        if(model[key].length > obj.limit[1]) throw new ValidationError(`El máximo de caracteres para la propiedad "${key}" es ${obj.limit[1]}.`);
+        if(model[key].length < obj.limit[0]) throw new ValidationError(`El mínimo de caracteres/elementos para la propiedad "${key}" es ${obj.limit[0]}.`);
+        if(model[key].length > obj.limit[1]) throw new ValidationError(`El máximo de caracteres/elementos para la propiedad "${key}" es ${obj.limit[1]}.`);
       }
       if(typeof obj.limit === 'number'){
         if(model[key].length > obj.limit) throw new ValidationError(`El máximo de caracteres para la propiedad "${key}" es ${obj.limit}.`);

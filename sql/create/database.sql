@@ -3,6 +3,7 @@ create table if not exists users
   id integer primary key autoincrement,
   status varchar(12) not null,
   username varchar(50) not null,
+  password varchar(255) not null,
   birthday date,
   email varchar(60),
   type varchar(12) not null,
@@ -37,6 +38,7 @@ create table if not exists affairs
   last_update timestamp not null,
   person_name varchar(100) not null,
   user_id integer not null,
+  status varchar(12) not null,
   foreign key (user_id) references users (id)
 );
 

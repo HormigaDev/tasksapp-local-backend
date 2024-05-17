@@ -21,7 +21,7 @@ const route = new Route('/edit-affair-timeline', async (req, res) => {
         title: r.title,
         description: r.description,
       };
-      if(!await existsAffair(affair_id)) throw new ValidationError(`El asunto con id '${affair_id}' no existe.`);
+      if(!await existsAffair(affair_id, req.user_id)) throw new ValidationError(`El asunto con id '${affair_id}' no existe.`);
       if(!await existsAffairTimeline(affair_id, timeline_id)) throw new ValidationError(`La línea de tiempo con id '${timeline_id}' no existe.`);
       await db.commit();
       db.serialize(async () => {
