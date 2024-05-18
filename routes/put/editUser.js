@@ -17,8 +17,6 @@ const route = new Route('/edit-user', async (req, res) => {
     const updates = {
       username: r.username,
       email: r.email,
-      user_type: r.user_type,
-      status: r.status,
       avatar_url: r.avatar_url
     };
     await db.commit();

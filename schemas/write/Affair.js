@@ -1,4 +1,4 @@
-module.exports = {
+String,module.exports = {
   title: {
     type: 'string',
     limit: [6, 100]

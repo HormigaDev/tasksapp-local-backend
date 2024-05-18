@@ -34,7 +34,7 @@ const route = new Route('/new-affair', async (req, res) => {
           const newTimeline = {
             affair_id: affairId,
             title: newAffair.title,
-            description: r.first_timeline,
+            description: r.first_timeline_description,
             created_at: new Date().toFormat(),
             last_update: new Date().toFormat()
           }

@@ -1,7 +1,7 @@
 module.exports = {
   username: {
     type: 'string',
-    limit: [4, 50],
+    limit: [3, 50],
     rules: [
       value => /^[a-zA-Z0-9_-]{4,}$/.test(value)
     ]

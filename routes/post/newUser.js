@@ -24,11 +24,11 @@ const route = new Route('/new-user', async (req, res) => {
       username: r.username,
       password: r.password,
       email: r.email,
-      user_type: r.user_type,
-      status: r.status,
-      created_at: r.created_at,
-      last_update: r.last_update,
-      last_session: r.last_session,
+      user_type: 'user',
+      status: 'active',
+      created_at: new Date().toFormat(),
+      last_update: new Date().toFormat(),
+      last_session: new Date().toFormat(),
       avatar_url: r.avatar_url
     }; // newUser - El objeto que contiene los datos del usuario
   
