@@ -13,10 +13,9 @@ const SQLError = require('../../../../classes/SQLError');
  * @returns {Promise<Array>}
  */
 function getAffairsData(userId, search, page, limit, archiveds, order_by, asc_desc){
-  archiveds = archiveds ? ["'created'", "'archived'"].join(', ') : ["'created'"].join(', ');
-  const sql = db.read('select', 'affairs_info', { status: archiveds, column: order_by, order: asc_desc });
+  const sql = db.read('select', 'affairs_info', { status: archiveds ? 1:0, column: order_by, order: asc_desc });
   return new Promise((resolve, reject) => {
-    db.all(sql, [search, search, userId, limit, page*limit], (err, rows) => {
+    db.all(sql, [userId, search, search, limit, page*limit], (err, rows) => {
       if(err){
         console.log(err);
         reject(new SQLError(`Hubo un error al obtener los asuntos`));

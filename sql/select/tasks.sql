@@ -11,6 +11,17 @@ p.name as priority_name,
 p.weight as priority_weight
 from tasks t
 left join priorities p on t.priority_id = p.id
-left join tasks_categories tc on tc.category_id in ({{categories}}) and tc.task_id = t.id
-where lower(t.title) like '%' || lower(?) || '%' or lower(t.description) like '%' || lower(?) || '%' and t.user_id = ?
-order by t.{{column}} {{order}} limit ? offset ?
+where (lower(t.title) like '%' || lower(?) || '%' or lower(t.description) like '%' || lower(?) || '%')
+and t.user_id = ?
+and (
+({{showarchiveds}} = 1 and t.status = 'archived') or
+({{showendeds}} = 1 and t.status = 'ended') or
+(t.status not in ('archived', 'ended'))
+) and
+({{priority}} = 0 or (p.weight = {{priority}}))
+order by
+case
+  when t.fixed = 1 then 0
+  else 1
+end {{order}},
+t.{{column}} {{order}} limit ? offset ?

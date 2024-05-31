@@ -8,7 +8,7 @@ module.exports = {
   },
   password: {
     type: 'string',
-    limit: [8, 20],
+    limit: [8, 64],
     rules: [
       {
         name: 'Tiene mayúsculas',
@@ -71,7 +71,7 @@ module.exports = {
     type: 'string',
     limit: [6, 255],
     rules: [
-      value => /^(https?|ftp):\/\/[^\s/$.?#-][^\s]*$/i.test(value)
+      value => /^(https?|ftp):\/\/[^\s/$.?#-][^\s]*\.(png|jpg|jpeg|avif|webp)$/i.test(value)
     ]
   }
 }

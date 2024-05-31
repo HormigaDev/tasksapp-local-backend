@@ -13,7 +13,7 @@ const route = new Route('/delete-affair', async (req, res) => {
     if(isNaN(affairId)){
       throw new ValidationError('El ID del asunto debe ser un número');
     }
-    if(!await existsAffair(affairId)){
+    if(!await existsAffair(affairId, req.user_id)){
       throw new ValidationError(`El asunto con ID '${affairId}' no existe`);
     }
     await db.commit();
@@ -31,7 +31,7 @@ const route = new Route('/delete-affair', async (req, res) => {
       } catch(err){
         await db.rollback();
         if(err instanceof SQLError){
-          return res.status(500).json({error: err.message});
+          return res.status(500).json({message: err.message});
         }
         console.log(err);
         res.status(500).json({ message: `Hubo un error al intentar eliminar el asunto. Error interno` });
@@ -39,7 +39,7 @@ const route = new Route('/delete-affair', async (req, res) => {
     });
   } catch(err){
     if(err instanceof ValidationError){
-      return res.status(400).json({error: err.message});
+      return res.status(400).json({message: err.message});
     }
     console.log(err);
     res.status(500).json({ message: `Hubo un error al intentar eliminar el asunto. Error interno` });

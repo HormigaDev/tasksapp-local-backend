@@ -14,8 +14,9 @@ module.exports = {
     'get-affairs',
     'get-affair-timelines',
     'get-tasks-by-date',
-    'get-tasks-calendary-day',
+    'get-tasks-calendar-day',
     'get-fixed-tasks',
+    'get-tasks-by-month'
   ],
   put: [
     'edit-user',

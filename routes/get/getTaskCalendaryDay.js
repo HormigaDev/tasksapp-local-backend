@@ -19,7 +19,7 @@ const db = require('../../database');
 const formatToModel = require('../../helpers/formatToModel');
 const getTaskCalendaryDayData = require('./functions/getTaskInfo/getTaskCalendaryDayData');
 
-const route = new Route('/get-tasks-calendary-day', async (req, res) => {
+const route = new Route('/get-tasks-calendar-day', async (req, res) => {
   try {
     const { date } = req.query;
     const userId = req.user_id;
@@ -29,9 +29,9 @@ const route = new Route('/get-tasks-calendary-day', async (req, res) => {
     }
 
     const tasks = await getTaskCalendaryDayData(userId, date);
-    const total = await db.total('tasks', `where user_id = ${userId}`);
+    const total = await db.total('tasks', `where user_id = ${userId} and run_date = '${date}'`)-2;
     if(!tasks.length){
-      return res.status(404).json({ message: 'Ninguna tarea encontrada' });
+      return res.status(200).json({ message: 'Ninguna tarea encontrada', tasks: [], total: 0 });
     } else {
       const formatedTasks = formatToModel(tasks, responseModel);
       return res.status(200).json({ tasks: formatedTasks, total });

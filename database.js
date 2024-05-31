@@ -63,9 +63,11 @@ db.last_rowid = () => {
  * @param {string} table - El nombre de la tabla 
  * @returns {Promise<number>}
  */
-db.total = (table, condition='') => {
+db.total = (table, conditions='', joins) => {
   return new Promise((resolve, reject) => {
-    db.get(`select count(*) as total from ${table} ${condition??''}`, (err, row) => {
+    const sql = `select count(*) as total from ${table} ${table[0]} ${joins?joins.join("\n\r"):''} ${conditions??''}`;
+    // console.log(sql);
+    db.get(sql, (err, row) => {
       if(err){
         console.log(err);
         return undefined;

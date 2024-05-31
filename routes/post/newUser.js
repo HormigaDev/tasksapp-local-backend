@@ -15,7 +15,8 @@ const savePhone = require('./functions/newUser/savePhone');
 const relationUserPhone = require('./functions/newUser/relationUserPhone');
 const createPriorities = require('./functions/newUser/createPriorities');
 const validateModel  = require('../../helpers/validateModel');
-const { hash } = require('../../helpers/ciphers');
+const { hash, encode } = require('../../helpers/ciphers');
+const toTime = require('../../helpers/convertToTime');
 
 const route = new Route('/new-user', async (req, res) => {
   try {
@@ -58,7 +59,11 @@ const route = new Route('/new-user', async (req, res) => {
                 if(await relationUserPhone(userId, phoneId)){
                   if(await createPriorities(userId)){
                     await db.commit();
-                    res.status(201).json({ message: '¡Usuario creado con éxito!', userId });
+                    const token = await encode({
+                      id: userId,
+                      expiresIn: Date.now() + toTime(365, 'days')
+                    });
+                    res.status(201).json({ message: '¡Usuario creado con éxito!', token });
                   }
                 }
               }

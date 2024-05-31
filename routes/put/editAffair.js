@@ -1,6 +1,7 @@
 const Route = require('../Route');
 const SQLError = require('../../classes/SQLError');
 const ValidationError = require('../../classes/ValidationError');
+const db = require('../../database');
 
 // esquemas
 const affairScheme = require('../../schemas/actualize/Affair');
@@ -18,6 +19,7 @@ const route = new Route('/edit-affair', async (req, res) => {
       const affair = {
         title: r.title,
         person_name: r.person_name,
+        status: r.status,
       };
       if(!await existsAffair(affairId, req.user_id)) throw new ValidationError(`El asunto con id '${affairId}' no existe.`);
       await db.commit();

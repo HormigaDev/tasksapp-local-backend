@@ -40,16 +40,16 @@ const route = new Route('/edit-category', async (req, res) => {
         res.status(200).json({ message: '¡Categoría actualizada correctamente!' });
       } catch(err){
         await db.rollback();
-        if(err instanceof SQLError) return res.status(500).json({ error: err.message });
-        if(err instanceof ValidationError) return res.status(400).json({ error: err.message });
+        if(err instanceof SQLError) return res.status(500).json({ message: err.message });
+        if(err instanceof ValidationError) return res.status(400).json({ message: err.message });
         console.log(err);
-        return res.status(500).json({ error: '¡Ha ocurrido un error al intentar actualizar la categoría!' });
+        return res.status(500).json({ message: '¡Ha ocurrido un error al intentar actualizar la categoría!' });
       }
     });
   } catch(err){
-    if(err instanceof ValidationError) return res.status(400).json({ error: err.message });
+    if(err instanceof ValidationError) return res.status(400).json({ message: err.message });
     console.log(err);
-    return res.status(500).json({ error: '¡Ha ocurrido un error al intentar actualizar la categoría!' });
+    return res.status(500).json({ message: '¡Ha ocurrido un error al intentar actualizar la categoría!' });
   }
 });
 

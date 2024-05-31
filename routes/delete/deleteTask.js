@@ -14,7 +14,7 @@ const route = new Route('/delete-task', async (req, res) => {
       throw new ValidationError('El ID de la tarea debe ser un número');
     }
     if(!await existsTask(taskId)){
-      throw new ValidationError(`La tarea con ID '${taskId}' no existe`);
+      return res.status(404).json({message:`La tarea con ID '${taskId}' no existe`})
     }
     await db.commit();
     db.serialize(async () => {
@@ -30,7 +30,7 @@ const route = new Route('/delete-task', async (req, res) => {
       } catch(err){
         await db.rollback();
         if(err instanceof SQLError){
-          return res.status(500).json({ error: err.message });
+          return res.status(500).json({ message: err.message });
         }
         console.log(err);
         res.status(500).json({ message: `Hubo un error al intentar eliminar la tarea. Error interno` });
@@ -38,7 +38,7 @@ const route = new Route('/delete-task', async (req, res) => {
     });
   } catch(err){
     if(err instanceof ValidationError){
-      return res.status(400).json({error: err.message});
+      return res.status(400).json({message: err.message});
     }
     console.log(err);
     res.status(500).json({ message: `Hubo un error al intentar eliminar la tarea. Error interno` });

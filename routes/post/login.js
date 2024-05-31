@@ -41,11 +41,11 @@ const route = new Route('/login', async(req, res) => {
       if(await compare(password, user.password)){
         const token = await encode({
           id: user.id,
-          expiresIn: Date.now() + toTime(3, 'hours')
+          expiresIn: Date.now() + toTime(365, 'days')
         });
         return res.status(200).json({ token });
       } else {
-        return res.status(401).json({ message: 'Contraseña incorrecta' });
+        return res.status(401).json({ message: 'Contraseña incorrecta', code: 'unauthorized' });
       }
     }
 

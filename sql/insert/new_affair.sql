@@ -2,7 +2,7 @@ insert into affairs (
   title,
   person_name,
   user_id,
-  created_at,
+  status,
   last_update,
-  status
+  created_at
 ) values (?, ?, ?, ?, ?, ?);

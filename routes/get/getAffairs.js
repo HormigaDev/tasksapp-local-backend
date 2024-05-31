@@ -4,7 +4,8 @@ const responseModel = [
     title: 'affair_title',
     personName: 'affair_person_name',
     createdAt: 'affair_created_at',
-    lastUpdate: 'affair_last_update'
+    lastUpdate: 'affair_last_update',
+    status: 'affair_status',
   }
 ];
 
@@ -24,17 +25,22 @@ const getAffairsData = require('./functions/getAffairInfo/getAffairsData');
 const route = new Route('/get-affairs', async(req, res) => {
   try {
     let { search='', page, limit, archiveds, order_by, asc_desc } = req.query;
-    page = Number(page) || 0;
+    page = Number(page)-1 || 0;
     limit = Number(limit) || 10;
-    archiveds = Boolean(archiveds);
+    archiveds = archiveds === 'true' ? true : false;
+
+    if(page < 0) page = 0;
+
+    const archivedsCondition = archiveds ? '':`and a.status != 'archived'`;
+    const searchCondition = search ? `and lower(title) like  '%' || lower('${search}') || '%'` :'';
     
-    const total = await db.total('affairs', `where user_id = ${req.user_id}`);
+    const total = await db.total('affairs', `where a.user_id = ${req.user_id} ${archivedsCondition} ${searchCondition}`);
     if(!total){
-      return res.status(404).json({ message: 'Ningún asunto encontrado', code: 'not_found' });
+      return res.status(200).json({ message: 'Ningún asunto encontrado', affairs: [], total: 0 });
     } else {
       const totalPages = Math.ceil(total / limit) - 1;
       if(page > totalPages){
-        return res.status(404).json({ message: 'La página solicitada no existe', code: 'invalid_page' });
+        return res.status(200).json({ message: 'La página solicitada no existe', affairs: [], total: 0, code: 'invalid_page' });
       }
     }
     
@@ -44,7 +50,7 @@ const route = new Route('/get-affairs', async(req, res) => {
       if(affairs.length){
         return res.status(200).json({affairs: formatToModel(affairs, responseModel), total});
       } else {
-        return res.status(404).json({ message: 'Ningún asunto encontrado', code: 'not_found' });
+        return res.status(200).json({ message: 'Ningún asunto encontrado',affairs:[], total: 0, code: 'not_found' });
       }
     }
 
@@ -54,6 +60,7 @@ const route = new Route('/get-affairs', async(req, res) => {
     } else if(err instanceof SQLError){
       return res.status(500).json({ message: 'Error en la base de datos', code: 'internal_error' });
     } else {
+      console.log(err);
       return res.status(500).json({ message: 'Error interno del servidor', code: 'internal_error' });
     }
   }

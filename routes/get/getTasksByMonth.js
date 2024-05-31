@@ -2,10 +2,16 @@ const responseModel = [
   {
     id: 'task_id',
     title: 'task_title',
+    description: 'task_description',
+    status: 'task_status',
     priority: {
       name: 'priority_name',
       weight: 'priority_weight'
     },
+    fixed: 'task_fixed',
+    createdAt: 'task_created_at',
+    lastUpdate: 'task_last_update',
+    runDate: 'task_run_date',
     categories: [
       {
         id: 'category_id',
@@ -24,29 +30,31 @@ const db = require('../../database');
 
 // funciones
 const formatToModel = require('../../helpers/formatToModel');
-const getTasksByDateData = require('./functions/getTaskInfo/getTasksByDateData');
-const getTasksCategories = require('./functions/getTaskInfo/getTaskCategories');
+const getTasksByMonthData = require('./functions/getTaskInfo/getTasksByMonthData');
+const getTaskCategories = require('./functions/getTaskInfo/getTaskCategories');
 
-const route = new Route('/get-tasks-by-date', async(req, res) => {
+const route = new Route('/get-tasks-by-month', async(req, res) => {
   try {
-    const { date } = req.query;
+    let { month, year } = req.query;
+    month = Number(month);
+    year = Number(year);
     const userId = req.user_id;
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if(!dateRegex.test(date)){
-      throw new ValidationError('Fecha inválida');
+    if(!month || !year){
+      throw new ValidationError('Mes y año son requeridos');
     }
-    const queries = db.read('select', 'tasks_by_date').split(";");
-    const tasks = await getTasksByDateData(userId, date, queries[0]);
-    const total = await db.total('tasks', `where user_id = ${userId} and run_date = '${date}'`);
+    if(year < 1900) throw new ValidationError('Año inválido');
+    if(month < 1 || month > 12) throw new ValidationError('Mes inválido');
+    const tasks = await getTasksByMonthData(userId, month, year);
+
     for (const i in tasks){
-      const categories = await getTasksCategories(tasks[i].task_id);
+      const categories = await getTaskCategories(tasks[i].task_id);
       tasks[i].categories = categories;
     }
     if(!tasks.length){
-      return res.status(200).json({ tasks: [], total: 0 });
+      return res.status(200).json({ tasks: [] });
     } else {
       const formatedTasks = formatToModel(tasks, responseModel);
-      return res.status(200).json({tasks: formatedTasks, total});
+      return res.status(200).json({tasks: formatedTasks});
     }
   } catch(err){
     if(err instanceof ValidationError){

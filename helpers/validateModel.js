@@ -12,7 +12,7 @@ function validateModel(model, schema){
   if(typeof model !== 'object' || Array.isArray(model)) throw new ValidationError('El modelo debe ser un objeto');
   if(typeof schema !== 'object' || Array.isArray(schema)) throw new ValidationError('El esquema debe ser un objeto');
   for(const key in schema){
-    if(model[key] === undefined) throw new ValidationError(`La propiedad "${key}" no existe en el objeto informado.`)
+    if(model[key] === undefined) throw new ValidationError(`La propiedad "${key}" no existe en el objeto informado.`);
     const obj = schema[key];
     if(obj.type){
       if(Array.isArray(obj.type)){

@@ -1,6 +1,7 @@
 const Route = require('../Route');
 const SQLError = require('../../classes/SQLError');
 const ValidationError = require('../../classes/ValidationError');
+const db = require('../../database');
 
 // esquemas
 const affairScheme = require('../../schemas/actualize/AffairTimeline');
@@ -37,6 +38,9 @@ const route = new Route('/edit-affair-timeline', async (req, res) => {
               await updateAffairTimeline('timeline_'+key, value, timeline_id);
             } 
           }
+          await updateAffairTimeline('last_update', new Date().toFormat(), timeline_id);
+          await db.commit();
+          res.status(200).json({ message: '¡Línea de tiempo actualizada correctamente!' });
         } catch(err){
           await db.rollback();
           if(err instanceof SQLError) return res.status(500).json({ error: err.message });

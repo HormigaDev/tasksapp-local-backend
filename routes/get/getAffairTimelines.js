@@ -21,7 +21,7 @@ const route = new Route('/get-affair-timelines', async(req, res) => {
   try {
     const affairId = Number(req.query.affair_id);
     const userId = req.user_id;
-    if(Number.isInteger(affairId)) throw new ValidationError('El ID del asunto es inválido');
+    if(!Number.isInteger(affairId)) throw new ValidationError('El ID del asunto es inválido');
     if(!await existsAffair(affairId, userId)) throw new ValidationError(`El asunto '${affairId}' no existe!`);
 
     let timelines = await getAffairTimelinesData(affairId);

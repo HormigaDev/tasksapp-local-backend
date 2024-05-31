@@ -1,0 +1,1 @@
+select run_date from tasks where id = ? and run_date = ?;
