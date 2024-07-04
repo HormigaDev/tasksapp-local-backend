@@ -67,11 +67,4 @@ module.exports = {
       value => { const date = new Date(value); return date instanceof Date && !isNaN(date)}
     ]
   },
-  avatar_url: {
-    type: 'string',
-    limit: [6, 255],
-    rules: [
-      value => /^(https?|ftp):\/\/[^\s/$.?#-][^\s]*\.(png|jpg|jpeg|avif|webp)$/i.test(value)
-    ]
-  }
 }

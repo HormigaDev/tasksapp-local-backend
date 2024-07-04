@@ -1,0 +1,1 @@
+update avatars set file_name = ?, file_type = ?, file_data = ? where user_id = ?;

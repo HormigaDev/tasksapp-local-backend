@@ -31,3 +31,21 @@ Number.prototype.repeat = function(quantity=2){
   }
   return array;
 }
+
+Object.prototype.toSnakeCase = function(){
+  const obj = this;
+  const newObj = {};
+  for(const key of Object.keys(obj)){
+    newObj[key.replace(/([A-Z])/g, '_$1').toLowerCase()] = obj[key];
+  }
+  return newObj;
+}
+
+Object.prototype.toCamelCase = function(){
+  const obj = this;
+  const newObj = {};
+  for(const key of Object.keys(obj)){
+    newObj[key.replace(/_([a-z])/g, (g) => g[1].toUpperCase())] = obj[key];
+  }
+  return newObj;
+}

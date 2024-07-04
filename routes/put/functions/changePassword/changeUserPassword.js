@@ -5,17 +5,24 @@ const SQLError = require('../../../../classes/SQLError');
  * 
  * @param {number} userId - ID del usuario
  * @param {string} newPassword - Nueva contraseña
- * @returns {Promise<boolean>}
+ * @returns {Promise<string> | Promise<undefined>}
  */
 function changeUserPassword(userId, newPassword){
   const sql = db.read('update/user', 'user_password');
   return new Promise((resolve, reject) => {
-    db.run(sql, [newPassword, userId], (err) => {
-      if(err){
-        console.log(err);
-        reject(new SQLError('¡Ha ocurrido un error al intentar cambiar la contraseña!'));
+    db.get(`select password from users where id = ?`, [userId], (error, prevData) => {
+      if(error){
+        console.log(error);
+        reject(new SQLError("Hubo un error al obtener los datos previos del usuario"));
       } else {
-        resolve(true);
+        db.run(sql, [newPassword, userId], (err) => {
+          if(err){
+            console.log(err);
+            reject(new SQLError('¡Ha ocurrido un error al intentar cambiar la contraseña!'));
+          } else {
+            resolve(prevData ? prevData.password : undefined);
+          }
+        });
       }
     });
   });

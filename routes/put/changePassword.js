@@ -15,6 +15,7 @@ const validateModel = require('../../helpers/validateModel');
 const changeUserPassword = require('./functions/changePassword/changeUserPassword');
 const getCurrentPassword = require('./functions/changePassword/getCurrentPassword');
 const { hash, compare } = require('../../helpers/ciphers');
+const registerLog = require('../../helpers/registerLog');
 
 const route = new Route('/change-password', async (req, res) => {
   try {
@@ -25,16 +26,31 @@ const route = new Route('/change-password', async (req, res) => {
     if(validateModel({prevPassword, newPassword}, schema)){
 
       const currentPassword = await getCurrentPassword(req.user_id);
-      if(!currentPassword) throw new ValidationError('¡La contraseña actual no coincide con la registrada en la base de datos!');
-      if(!await compare(prevPassword, currentPassword)) throw new ValidationError('¡La contraseña actual no coincide con la registrada en la base de datos!');
+      if(!currentPassword) {
+        return res.status(401).json({ message: '¡La contraseña actual no coincide con la registrada en la base de datos!' });
+      }
+      if(!await compare(prevPassword, currentPassword))  {
+        return res.status(401).json({ message: '¡La contraseña actual no coincide con la registrada en la base de datos!' });
+      }
 
       await db.commit();
       db.serialize(async () => {
         try {
+          const userDetails = {
+            user_id: req.user_id,
+            password: []
+          }
           await db.begin();
-          if(await changeUserPassword(req.user_id, await hash(newPassword))){
+          const new_password = await hash(newPassword);
+          const prevData = await changeUserPassword(req.user_id, new_password);
+          if(prevData !== undefined){
+            userDetails.password = [prevData, new_password];
+            await registerLog(req.user_id, 'update', 'users', userDetails.toSnakeCase());
             await db.commit();
             res.status(200).json({ message: '¡Contraseña cambiada correctamente!' });
+          } else {
+            await db.rollback();
+            return res.status(500).json({ message: '¡Ha ocurrido un error al intentar cambiar la contraseña!' });
           }
         } catch(err){
           await db.rollback();

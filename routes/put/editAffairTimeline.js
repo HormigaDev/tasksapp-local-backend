@@ -12,6 +12,7 @@ const existsAffair = require('./functions/editAffair/existsAffair');
 const existsAffairTimeline = require('./functions/editAffair/existsAffairTimeline');
 const checkProp = require('./functions/editAffair/checkProp');
 const updateAffairTimeline = require('./functions/editAffair/updateAffair');
+const  registerLog = require('../../helpers/registerLog');
 
 const route = new Route('/edit-affair-timeline', async (req, res) => {
     try {
@@ -27,6 +28,12 @@ const route = new Route('/edit-affair-timeline', async (req, res) => {
       await db.commit();
       db.serialize(async () => {
         try {
+          const affairDetails = {
+            affair_id,
+            timeline_id,
+            title: [],
+            description: []
+          }
           await db.begin();
           for(const key of Object.keys(affairTimeline)){
             const value = affairTimeline[key];
@@ -35,10 +42,17 @@ const route = new Route('/edit-affair-timeline', async (req, res) => {
             }
             if(validateProp(key, value, affairScheme)){
               if(await checkProp('timeline_'+key, value, affair_id)) continue;
-              await updateAffairTimeline('timeline_'+key, value, timeline_id);
+              const prevData = await updateAffairTimeline('timeline_'+key, value, timeline_id);
+              if(prevData !== undefined){
+                affairDetails[key] = [prevData, value];
+              }
             } 
           }
           await updateAffairTimeline('last_update', new Date().toFormat(), timeline_id);
+          for(const key of Object.keys(affairDetails).slice(2)){
+            if(affairDetails[key].length === 0) delete affairDetails[key];
+          }
+          await registerLog(req.user_id, 'update', 'affairs', affairDetails.toSnakeCase());
           await db.commit();
           res.status(200).json({ message: '¡Línea de tiempo actualizada correctamente!' });
         } catch(err){

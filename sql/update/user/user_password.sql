@@ -1,3 +1,3 @@
 update users
-set password = ?
+set password = ?, last_update = datetime('now')
 where id = ?;

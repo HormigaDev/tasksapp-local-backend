@@ -11,13 +11,14 @@ const affairTimelineScheme = require('../../schemas/write/AffairTimeline');
 const saveAffair = require('./functions/newAffair/saveAffair');
 const saveAffairTimeline = require('./functions/newAffair/saveAffairTimeline');
 const validateModel = require('../../helpers/validateModel');
+const registerLog = require('../../helpers/registerLog');
 
 const route = new Route('/new-affair', async (req, res) => {
   try {
     const r = req.body;
     const newAffair = {
       title: r.title,
-      person_name: r.person_name,
+      person_name: 'default',
       user_id: req.user_id,
       status: 'created'
     }
@@ -31,6 +32,8 @@ const route = new Route('/new-affair', async (req, res) => {
         try {
           await db.begin();
           const affairId = await saveAffair(newAffair);
+          const userDetails = { affairId };
+          await registerLog(req.user_id, 'insert', 'affairs', userDetails.toSnakeCase());
           const newTimeline = {
             affair_id: affairId,
             title: newAffair.title,
@@ -39,7 +42,10 @@ const route = new Route('/new-affair', async (req, res) => {
             last_update: new Date().toFormat()
           }
           if(validateModel(newTimeline, affairTimelineScheme)){
-            if(await saveAffairTimeline(newTimeline)){
+            const timelineId = await saveAffairTimeline(newTimeline);
+            if(timelineId){
+              const timelineDetails = { timelineId };
+              await registerLog(req.user_id, 'insert', 'timelines', timelineDetails.toSnakeCase());
               await db.commit();
             }
             res.status(201).json({ message: '¡Asunto creado correctamente!' });

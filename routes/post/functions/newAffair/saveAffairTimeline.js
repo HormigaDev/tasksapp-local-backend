@@ -9,12 +9,13 @@ const SQLError = require('../../../../classes/SQLError');
 function saveAffairTimeline(newTimeline){
   const sql = db.read('insert', 'new_affair_timeline');
   return new Promise((resolve, reject) => {
-    db.run(sql, newTimeline.toArray(), (err) => {
+    db.run(sql, newTimeline.toArray(), async (err) => {
       if(err){
         console.log(err);
         reject(new SQLError('¡Error al guardar línea de tiempo del asunto!'));
       } else {
-        resolve(true);
+        const id = await db.last_rowid()
+        resolve(id);
       }
     })
   });

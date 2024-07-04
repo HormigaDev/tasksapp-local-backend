@@ -10,6 +10,7 @@ const userScheme = require('../../schemas/actualize/User');
 const validateProp = require('../../helpers/validateProp');
 const updateUser = require('./functions/editUser/updateUser');
 const checkProp = require('./functions/editUser/checkProp');
+const registerLog = require('../../helpers/registerLog');
 
 const route = new Route('/edit-user', async (req, res) => {
   try {
@@ -22,15 +23,28 @@ const route = new Route('/edit-user', async (req, res) => {
     await db.commit();
     db.serialize(async () => {
       try {
+        const userDetails = {
+          user_id: req.user_id,
+          username: [],
+          email: [],
+          avatar_url: []
+        }
         for(const key of Object.keys(updates)){
           const value = updates[key];
           if(!value) continue;
           if(validateProp(key, value, userScheme)){
             if(await checkProp(key, value, req.user_id)) continue;
-            await updateUser(key, value, req.user_id);
-          } 
+            const prevData = await updateUser(key, value, req.user_id);
+            if(prevData !== undefined){
+              userDetails[key] = [prevData, value];
+            }
+          }
         }
         await updateUser('last_update', new Date().toFormat(), req.user_id);
+        for(const key of Object.keys(userDetails).slice(1)){
+          if(userDetails[key].length === 0) delete userDetails[key];
+        }
+        await registerLog(req.user_id, 'update', 'users', userDetails.toSnakeCase());
         await db.commit();
         res.status(200).json({ message: '¡Usuario actualizado correctamente!' });
       } catch(err){

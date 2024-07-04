@@ -29,7 +29,7 @@ function decode(token){
   return new Promise((resolve, reject) => {
     jwt.verify(token, 'S3CR37', (err, decoded) => {
       if(err){
-        console.log(err);
+        // console.log(err);
         reject(new Error('Error decoding token'))
       } else {
         resolve(decoded);

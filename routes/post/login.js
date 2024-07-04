@@ -1,6 +1,7 @@
 const ValidationError = require('../../classes/ValidationError');
 const SQLError = require('../../classes/SQLError');
 const Route = require('../Route');
+const configurations = require('../../configs');
 const db = require('../../database');
 
 // esquemas
@@ -43,7 +44,22 @@ const route = new Route('/login', async(req, res) => {
           id: user.id,
           expiresIn: Date.now() + toTime(365, 'days')
         });
-        return res.status(200).json({ token });
+        configurations.set('currentLoggedUserId', user.id);
+        await db.commit();
+        db.serialize(async () => {
+          try {
+            await db.begin();
+            db.run("update users set last_session = datetime('now') where id = ?", [user.id], async (err) => {
+              if(err) return console.log(err);
+              await db.commit();
+            });
+            return res.status(200).json({ token });
+          } catch(err){
+            console.log(err);
+            await db.rollback();
+            res.status(500).json({ message: '¡Error al iniciar sesión! Error interno.' });
+          }
+        });
       } else {
         return res.status(401).json({ message: 'Contraseña incorrecta', code: 'unauthorized' });
       }

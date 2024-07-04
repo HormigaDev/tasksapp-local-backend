@@ -1,0 +1,1 @@
+insert into avatars (file_name, file_type, file_data, user_id) values (?, ?, ?, ?);

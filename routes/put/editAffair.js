@@ -11,6 +11,7 @@ const validateProp = require('../../helpers/validateProp');
 const existsAffair = require('./functions/editAffair/existsAffair');
 const checkProp = require('./functions/editAffair/checkProp');
 const updateAffair = require('./functions/editAffair/updateAffair');
+const registerLog = require('../../helpers/registerLog');
 
 const route = new Route('/edit-affair', async (req, res) => {
     try {
@@ -25,6 +26,12 @@ const route = new Route('/edit-affair', async (req, res) => {
       await db.commit();
       db.serialize(async () => {
         try {
+          const affairDetails = {
+            affair_id: affairId,
+            title: [],
+            person_name: [],
+            status: []
+          }
           for(const key of Object.keys(affair)){
             const value = affair[key];
             if(!value){
@@ -32,10 +39,19 @@ const route = new Route('/edit-affair', async (req, res) => {
             }
             if(validateProp(key, value, affairScheme)){
               if(await checkProp(key, value, affairId)) continue;
-              await updateAffair(key, value, affairId);
-            } 
+              const prevData = await updateAffair(key, value, affairId);
+              if(prevData !== undefined){
+                affairDetails[key] = [prevData, value];
+              }
+            }
           }
           await updateAffair('last_update', new Date().toFormat(), affairId);
+          for(const key of Object.keys(affairDetails).slice(1)){
+            if(affairDetails[key].length === 0) delete affairDetails[key];
+          }
+          if (r.status !== 'created' && r.status !== 'archived'){
+            await registerLog(req.user_id, 'update', 'affairs', affairDetails.toSnakeCase());
+          }
           await db.commit();
           res.status(200).json({ message: '¡Asunto actualizado correctamente!' });
         } catch(err){

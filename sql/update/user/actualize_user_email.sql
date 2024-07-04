@@ -1,3 +1,3 @@
 update users
-set email = ?
+set email = ?, last_update = datetime('now')
 where id = ?;

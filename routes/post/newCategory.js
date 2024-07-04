@@ -10,6 +10,7 @@ const categoryScheme = require('../../schemas/write/CategoryScheme');
 const existsCategory = require('./functions/newCategory/existsCategory');
 const saveCategory = require('./functions/newCategory/saveCategory');
 const validateModel = require('../../helpers/validateModel');
+const registerLog = require('../../helpers/registerLog');
 
 const route = new Route('/new-category', async (req, res) => {
   try {
@@ -30,6 +31,7 @@ const route = new Route('/new-category', async (req, res) => {
             nc.user_id = userId;
             categoryId = await saveCategory(nc);
           }
+          await registerLog(userId, 'insert', 'categories', { category_id: categoryId });
           await db.commit();
           res.status(201).json({ message: '¡Categoría creada exitosamente!', categoryId });
         } catch(err){

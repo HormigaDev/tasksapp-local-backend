@@ -5,6 +5,7 @@ const db = require('../../database');
 
 const existsUser = require('./functions/deleteUser/existsUser');
 const removeUserData = require('./functions/deleteUser/removeUserData');
+const registerLog = require('../../helpers/registerLog');
 
 const route = new Route('/delete-user', async (req, res) => {
   try {
@@ -13,6 +14,10 @@ const route = new Route('/delete-user', async (req, res) => {
     await db.commit();
     db.serialize(async () => {
       try {
+        const details = {
+          userId,
+          authorId: userId
+        }
         await db.begin();
         const queries = db.read('delete', 'user_info').split(";").map(query => query.trim());
         for(const query of queries){
@@ -22,6 +27,7 @@ const route = new Route('/delete-user', async (req, res) => {
             console.log(err);
           }
         }
+        await registerLog(userId, 'delete', 'users', details.toSnakeCase());
         await db.commit();
         res.status(200).json({ message: `El usuario con ID '${userId}' ha sido eliminado correctamente` });
       } catch(err){

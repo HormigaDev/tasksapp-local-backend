@@ -11,6 +11,7 @@ const validateProp = require('../../helpers/validateProp');
 const existsCategory = require('./functions/editCategory/existsCategory');
 const updateCategory = require('./functions/editCategory/updateCategory');
 const checkProp = require('./functions/editCategory/checkProp');
+const registerLog = require('../../helpers/registerLog');
 
 const route = new Route('/edit-category', async (req, res) => {
   try {
@@ -25,6 +26,12 @@ const route = new Route('/edit-category', async (req, res) => {
     await db.commit();
     db.serialize(async () => {
       try {
+        const categoryDetails = {
+          category_id: id,
+          name: [],
+          color: [],
+          icon: []
+        }
         await db.begin();
         for(const key of Object.keys(category)){
           const value = category[key];
@@ -33,9 +40,16 @@ const route = new Route('/edit-category', async (req, res) => {
           }
           if(validateProp(key, value, categoryScheme)){
             if(await checkProp(key, value, id)) continue;
-            await updateCategory(key, value, id);
+            const prevData = await updateCategory(key, value, id);
+            if(prevData !== undefined){
+              categoryDetails[key] = [prevData, value];
+            }
           } 
         }
+        for(const key of Object.keys(categoryDetails).slice(1)){
+          if(categoryDetails[key].length === 0) delete categoryDetails[key];
+        }
+        await registerLog(req.user_id, 'update', 'categories', categoryDetails.toSnakeCase());
         await db.commit();
         res.status(200).json({ message: '¡Categoría actualizada correctamente!' });
       } catch(err){

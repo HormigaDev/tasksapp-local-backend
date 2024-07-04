@@ -60,18 +60,18 @@ const route = new Route('/get-tasks', async(req, res) => {
       ${priority === 0 ? '':`and p.weight = ${priority}`} ${searchCondition}
     `, [priority === 0 ? '':`left join priorities p on p.weight = ${priority} and p.user_id = ${req.user_id} and p.id = t.priority_id`]);
     if(!totalTasks){
-      return res.status(404).json({ message: 'Ninguna tarea encontrada' });
+      return res.status(200).json({ message: 'Ninguna tarea encontrada', tasks: [], totalTasks: 0});
     } else {
       const totalPages = Math.ceil(totalTasks / limit) - 1;
       if(page > totalPages){
-        return res.status(404).json({ message: 'La página solicitada no existe' });
+        return res.status(200).json({ message: 'La página solicitada no existe', tasks: [], totalTasks: 0 });
       }
     }
     const model = { page, limit, search, categories, priority, order_by, asc_desc };
     if(validateModel(model, requestSchema)){
       let tasks = await getTasks(req.user_id, search, page, limit, order_by, asc_desc, show_archives, show_endeds, priority);
       if(!tasks){
-        return res.status(404).json({ message: "No se encontraron tareas con los parámetros especificados" });
+        return res.status(200).json({ message: "No se encontraron tareas con los parámetros especificados", tasks: [], totalTasks: 0 });
       }
       for(let i in tasks){
         tasks[i].task_fixed = tasks[i].task_fixed === 1;

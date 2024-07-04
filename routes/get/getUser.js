@@ -32,10 +32,10 @@ const route = new Route('/get-user', async (req, res) => {
     res.status(200).json({user});
   }catch(err){
     if(err instanceof ValidationError || err instanceof SQLError){
-      return res.status(400).json({error: err.message});
+      return res.status(400).json({message: err.message});
     }
     console.log(err);
-    res.status(500).json({error: 'Hubo un error al intentar obtener los datos del usuario'});
+    res.status(500).json({message: 'Hubo un error al intentar obtener los datos del usuario'});
   }
 });
 

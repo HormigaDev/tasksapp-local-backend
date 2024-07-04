@@ -10,8 +10,9 @@ const taskSchema = require('../../schemas/write/Task');
 const existsCategory = require('./functions/newTask/existsCategory');
 const saveTask = require('./functions/newTask/saveTask');
 const relationTaskCategory = require('./functions/newTask/relationTaskCategory');
-const saveNotification = require('./functions/newTask/saveNotification');
+// const saveNotification = require('./functions/newTask/saveNotification');
 const validateModel = require('../../helpers/validateModel');
+const registerLog = require('../../helpers/registerLog');
 
 const route = new Route('/new-task', async (req, res) => {
   try {
@@ -44,10 +45,9 @@ const route = new Route('/new-task', async (req, res) => {
           for(const c of categories){
             await relationTaskCategory(taskId, c);
           }
-          if(await saveNotification(nt.user_id, taskId)){
-            await db.commit();
-            return res.status(201).json({ message: '¡Tarea creada correctamente!' });
-          }
+          await registerLog(user_id, 'insert', 'tasks', { task_id: taskId  });
+          await db.commit();
+          return res.status(201).json({ message: '¡Tarea creada correctamente!' })
         } catch(err){
           console.log(err);
           await db.rollback();

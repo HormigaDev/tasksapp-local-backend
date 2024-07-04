@@ -6,6 +6,7 @@ const db = require('../../database');
 // funciones
 const existsAffair = require('../put/functions/editAffair/existsAffair');
 const removeAffairData = require('./functions/deleteAffair/removeAffairData');
+const registerLog = require('../../helpers/registerLog');
 
 const route = new Route('/delete-affair', async (req, res) => {
   try {
@@ -19,13 +20,17 @@ const route = new Route('/delete-affair', async (req, res) => {
     await db.commit();
     db.serialize(async () => {
       try {
+        const details = {
+          userId: req.user_id,
+          affairId
+        }
         const queries = db.read('delete', 'affair_info').split(";");
         await db.begin();
 
         for(const query of queries){
           await removeAffairData(affairId, query);
         }
-
+        await registerLog(req.user_id, 'delete', 'affairs', details.toSnakeCase())
         await db.commit();
         res.status(200).json({ message: `El asunto con ID '${affairId}' ha sido eliminado correctamente.` });
       } catch(err){

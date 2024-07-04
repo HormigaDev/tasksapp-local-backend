@@ -6,7 +6,6 @@ insert into users(
   status,
   created_at,
   last_update,
-  last_session,
-  avatar_url
+  last_session
 )
-values (?, ?, ?, ?, ?, ?, ?, ?, ?);
+values (?, ?, ?, ?, ?, ?, ?, ?);

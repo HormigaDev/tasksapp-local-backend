@@ -13,6 +13,7 @@ const updateTask = require('./functions/editTask/updateTask');
 const taskHasCategory = require('./functions/editTask/taskHasCategory');
 const insertCategory = require('./functions/editTask/insertCategory');
 const checkProp = require('./functions/editTask/checkProp');
+const registerLog = require('../../helpers/registerLog');
 
 const route = new Route('/edit-task', async (req, res) => {
   try {
@@ -22,9 +23,9 @@ const route = new Route('/edit-task', async (req, res) => {
       title: r.title,
       description: r.description,
       status: r.status,
-      fixed: Number(r.fixed),
       priority_id: Number(r.priority_id),
       run_date: r.run_date,
+      fixed: !r.fixed ? 0 : 1
     };
     let categories = r.categories;
     if(categories){
@@ -35,21 +36,48 @@ const route = new Route('/edit-task', async (req, res) => {
     await db.commit();
     db.serialize(async () => {
       try {
+        const taskDetails = {
+          task_id: taskId,
+          title: [],
+          description: [],
+          status: [],
+          priority_id: [],
+          run_date: [],
+          categories: [
+            [],
+            []
+          ]
+        }
         for(const key of Object.keys(task)){
           const value = task[key];
           if(!value){
             if(value !== 0) continue;
           }
           if(validateProp(key, value, taskScheme)){
-            if(await checkProp(key, value, taskId)) continue;
-            await updateTask(key, value, taskId);
+            if(await checkProp(key, value, taskId) && key !== 'priority_id') continue;
+            const prevData = await updateTask(key, value, taskId, req.user_id);
+            if(prevData !== undefined){
+              taskDetails[key] = [prevData, value];
+            }
           } 
         }
         await updateTask('last_update', new Date().toFormat(), taskId);
         for(const category of categories){
-          if(!await taskHasCategory(taskId, category)){
-            await insertCategory(taskId, category);
+          const hasCategory = await taskHasCategory(taskId, category);
+          if(hasCategory) {
+            taskDetails.categories[0].push(category);
           }
+          if(!hasCategory){
+            await insertCategory(taskId, category);
+            taskDetails.categories[1].push(category);
+          }
+        }
+        taskDetails.categories[1] = taskDetails.categories[0].concat(taskDetails.categories[1]);
+        for(const key of Object.keys(taskDetails).slice(1, 7)){
+          if(taskDetails[key].length === 0) delete taskDetails[key];
+        }
+        if(!r.fixed){
+          await registerLog(req.user_id, 'update', 'tasks', taskDetails.toSnakeCase());
         }
         await db.commit();
         res.status(200).json({ message: '¡Tarea actualizada correctamente!' });

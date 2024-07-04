@@ -3,6 +3,9 @@ const path = require('path');
 const db = new sqlite3.Database(path.join(process.env.ROOT, 'BbelStudio/Apps/Tasks/database.db'));
 const fs = require('fs');
 const configurations = require('./configs.js');
+const permissionTemplates = require('./classes/permissionTemplates');
+
+db.APP_URL = 'http://localhost:19222';
 
 db.read = (type, name, vars) => {
   const dir = path.resolve(__dirname, 'sql', type, `${name}.sql`);
@@ -88,8 +91,18 @@ function createTables(){
           await db.rollback();
           resolve(false);
         } else {
-          await db.commit();
-          resolve(true);
+          for(const permission of new permissionTemplates('admin').mount()){
+            db.run(db.read('create', 'create_permissions', { permission }), [], async (err) => {
+              if(err){
+                // console.error(err);
+                await db.rollback();
+                resolve(false);
+              } else {
+                await db.commit();
+                resolve(true);
+              }
+            });
+          }
         }
       });
     });
@@ -100,6 +113,7 @@ async function createDatabase(){
   if(configurations.get('databased') === true) return;
   await createTables();
   configurations.set('databased', true);
+  configurations.set('groupNotifications', true);
 }
 db.createDatabase = createDatabase;
 

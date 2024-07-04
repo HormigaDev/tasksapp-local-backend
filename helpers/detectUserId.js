@@ -23,7 +23,7 @@ async function detectUserId(req, res, next){
   const url = req.url;
   const route = url.split('/')[1].split('?')[0];
   const userId = Number(req.headers['user-id']);
-  if(validateEndpoints[method].includes(route)){
+  if(validateEndpoints[method]?.includes(route)){
     if(isNaN(userId)){
       res.status(400).json({ message: '¡El encabezado User-Id no es un número!'});
       return;

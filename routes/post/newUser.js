@@ -17,6 +17,8 @@ const createPriorities = require('./functions/newUser/createPriorities');
 const validateModel  = require('../../helpers/validateModel');
 const { hash, encode } = require('../../helpers/ciphers');
 const toTime = require('../../helpers/convertToTime');
+const referenceUserPermissions = require('./functions/newUser/referenceUserPermissions');
+const setAvatarURL = require('./functions/newUser/setAvatarURL');
 
 const route = new Route('/new-user', async (req, res) => {
   try {
@@ -29,8 +31,7 @@ const route = new Route('/new-user', async (req, res) => {
       status: 'active',
       created_at: new Date().toFormat(),
       last_update: new Date().toFormat(),
-      last_session: new Date().toFormat(),
-      avatar_url: r.avatar_url
+      last_session: new Date().toFormat()
     }; // newUser - El objeto que contiene los datos del usuario
   
     const np = {
@@ -52,6 +53,8 @@ const route = new Route('/new-user', async (req, res) => {
             nu.password = await hash(nu.password);
             const userId = await saveUser(nu);
             if(userId){
+              await referenceUserPermissions(userId, 'user');
+              await setAvatarURL(userId);
               if(!phoneId){
                 phoneId = await savePhone(np);
               }
@@ -78,7 +81,6 @@ const route = new Route('/new-user', async (req, res) => {
             }
           }
         });
-        // await db.commit();
       });
     }
   } catch(error){

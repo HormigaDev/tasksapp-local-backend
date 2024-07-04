@@ -9,6 +9,7 @@ const affairTimeline = require('../../schemas/write/AffairTimeline');
 // funciones
 const saveAffairTimeline = require('./functions/newAffair/saveAffairTimeline');
 const validateModel = require('../../helpers/validateModel');
+const registerLog = require('../../helpers/registerLog');
 
 const route = new Route('/new-affair-timeline', async (req, res) => {
   try {
@@ -26,7 +27,10 @@ const route = new Route('/new-affair-timeline', async (req, res) => {
       db.serialize(async () => {
         try {
           await db.begin();
-          if(await saveAffairTimeline(newTimeline)){
+          const timelineId = await saveAffairTimeline(newTimeline);
+          if(timelineId){
+            const timelineDetails = { timelineId };
+            await registerLog(req.user_id, 'insert', 'timelines', timelineDetails.toSnakeCase());
             await db.commit();
             return res.status(201).json({ message: '¡Línea de tiempo creada correctamente!' });
           }

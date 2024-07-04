@@ -3,8 +3,8 @@ module.exports = {
     'new-task',
     'new-category',
     'new-affair',
-    'new-schedule',
-    'new-relation-schedule-priority'
+    'new-affair-timeline',
+    'logout',
   ],
   get: [
     'get-user',
@@ -16,7 +16,11 @@ module.exports = {
     'get-tasks-by-date',
     'get-tasks-calendar-day',
     'get-fixed-tasks',
-    'get-tasks-by-month'
+    'get-tasks-by-month',
+    'get-schedule',
+    'get-username',
+    'get-notifications',
+    'user-stats'
   ],
   put: [
     'edit-user',
@@ -24,7 +28,11 @@ module.exports = {
     'edit-category',
     'edit-affair',
     'edit-affair-timeline',
-    'change-password'
+    'change-password',
+    'update-schedule',
+    'update-avatar',
+    'update-username',
+    'ignore-notification'
   ],
   delete: [
     'delete-user',
@@ -32,5 +40,38 @@ module.exports = {
     'delete-category',
     'delete-affair',
     'delete-affair-timeline'
-  ]
+  ],
+  permissions: {
+    'new-task': ['CREATE_TASKS'],
+    'new-category': ['CREATE_CATEGORIES'],
+    'new-affair': ['CREATE_AFFAIRS'],
+    'get-user': ['GET_USERINFO'],
+    'get-task': ['GET_TASKS'],
+    'get-categories': ['GET_CATEGORIES'],
+    'get-tasks': ['GET_TASKS'],
+    'get-affairs': ['GET_AFFAIRS'],
+    'get-affair-timelines': ['GET_AFFAIRS'],
+    'get-tasks-by-date': ['GET_TASKS'],
+    'get-tasks-calendar-day': ['GET_TASKS'],
+    'get-fixed-tasks': ['GET_TASKS'],
+    'get-tasks-by-month': ['GET_TASKS'],
+    'get-schedule': ['GET_SCHEDULES'],
+    'get-username': ['GET_USERINFO'],
+    'get-notifications': ['GET_USERINFO', 'GET_TASKS'],
+    'edit-user': ['UPDATE_USERINFO'],
+    'edit-task': ['UPDATE_TASKS'],
+    'edit-category': ['UPDATE_CATEGORIES'],
+    'edit-affair': ['UPDATE_AFFAIRS'],
+    'edit-affair-timeline': ['UPDATE_AFFAIRS'],
+    'change-password': ['UPDATE_USERINFO'],
+    'update-schedule': ['UPDATE_SCHEDULES'],
+    'update-avatar': ['UPDATE_USERINFO'],
+    'update-username': ['UPDATE_USERINFO'],
+    'ignore-notification': ['UPDATE_TASKS', 'UPDATE_USERINFO'],
+    'delete-user': ['DELETE_USERINFO'],
+    'delete-task': ['DELETE_TASKS'],
+    'delete-category': ['DELETE_CATEGORIES'],
+    'delete-affair': ['DELETE_AFFAIRS'],
+    'delete-affair-timeline': ['DELETE_AFFAIRS']
+  }
 }
