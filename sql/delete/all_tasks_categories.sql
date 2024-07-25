@@ -1,0 +1,1 @@
+delete from tasks_categories where task_id = ?;

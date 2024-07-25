@@ -14,6 +14,7 @@ const taskHasCategory = require('./functions/editTask/taskHasCategory');
 const insertCategory = require('./functions/editTask/insertCategory');
 const checkProp = require('./functions/editTask/checkProp');
 const registerLog = require('../../helpers/registerLog');
+const removeAllCategories = require('./functions/editTask/removeAllCategories');
 
 const route = new Route('/edit-task', async (req, res) => {
   try {
@@ -62,6 +63,7 @@ const route = new Route('/edit-task', async (req, res) => {
           } 
         }
         await updateTask('last_update', new Date().toFormat(), taskId);
+        await removeAllCategories(taskId);
         for(const category of categories){
           const hasCategory = await taskHasCategory(taskId, category);
           if(hasCategory) {

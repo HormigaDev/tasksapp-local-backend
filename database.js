@@ -1,7 +1,10 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const db = new sqlite3.Database(path.join(process.env.ROOT, 'BbelStudio/Apps/Tasks/database.db'));
 const fs = require('fs');
+if(fs.existsSync(path.join(process.env.ROOT, 'BbelStudio/Apps/Tasks/')) === false){
+  fs.mkdirSync(path.join(process.env.ROOT, 'BbelStudio/Apps/Tasks/'), { recursive: true });
+}
+const db = new sqlite3.Database(path.join(process.env.ROOT, 'BbelStudio/Apps/Tasks/database.db'));
 const configurations = require('./configs.js');
 const permissionTemplates = require('./classes/permissionTemplates');
 
