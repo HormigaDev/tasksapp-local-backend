@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const dir = path.join('C:/BbelStudio/Apps/Tasks/', 'configurations.json');
+const dir = path.join('./Tasks/', 'configurations.json');
 
 const configurations = {
   exists(){

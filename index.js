@@ -1,4 +1,4 @@
-process.env.ROOT = 'C:';
+process.env.ROOT = '.';
 require('./prototypes.js');
 
 const express = require('express');
